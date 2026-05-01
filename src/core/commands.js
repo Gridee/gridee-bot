@@ -17,6 +17,7 @@ export const Command = Object.freeze({
   HISTORY: 'HISTORY',
   MY_PROPERTY: 'MY_PROPERTY',
   REMOVE_TENANT: 'REMOVE_TENANT',
+  PROPERTY: 'PROPERTY',
   UNKNOWN: 'UNKNOWN',
 });
 

@@ -42,7 +42,7 @@ export class AddPropertyFlow {
     if (session.step === ScreenId.ADD_PROPERTY_LABEL) {
       data.label = requiredText(text, 'Property label');
       const result = await this.backend.createProperty({
-        landlordPhone: phone,
+        phone,
         address: data.address,
         flatCount: data.flatCount,
         label: data.label,

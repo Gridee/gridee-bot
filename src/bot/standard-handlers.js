@@ -46,6 +46,25 @@ export class StandardHandlers {
       return reply(renderScreen(ScreenId.MY_PROPERTY_VIEW, result.property));
     }
 
+    if (parsed.command === Command.REMOVE_TENANT) {
+      if (!parsed.args.phone) return reply('Please include the tenant phone number. Example: REMOVE TENANT 2348000000000');
+      const result = await this.backend.removeTenant({ phone, tenantPhone: parsed.args.phone });
+      return reply(renderScreen(ScreenId.TENANT_REMOVED_LANDLORD, { name: result.tenantName, property: result.propertyName }));
+    }
+
+    if (parsed.command === Command.PROPERTY) {
+      if (!parsed.args.propertyCode) return reply('Please include a property code. Example: PROPERTY GRD-LAG-0001');
+      const result = await this.backend.getPropertyDetails({ phone, code: parsed.args.propertyCode });
+      return reply(renderScreen(ScreenId.PROPERTY_DETAIL, {
+        code: result.code,
+        label: result.label,
+        address: result.address,
+        flatCount: result.flat_count,
+        activeTenantCount: result.activeTenantCount,
+        solarStatus: result.status
+      }));
+    }
+
     return null;
   }
 }
