@@ -43,14 +43,14 @@ export class MockBackendClient {
     return { user };
   }
 
-  async createProperty({ landlordPhone, address, flatCount, label }) {
-    const landlord = this.users.get(normalisePhone(landlordPhone));
+  async createProperty({ phone, address, flatCount, label }) {
+    const landlord = this.users.get(normalisePhone(phone));
     if (!landlord || landlord.role !== 'landlord') throw new Error('Landlord not found');
     const code = createCode(this.propertyIndex++);
     const property = {
       id: crypto.randomUUID(),
       code,
-      landlordPhone: normalisePhone(landlordPhone),
+      landlordPhone: normalisePhone(phone),
       landlordName: landlord.name,
       address,
       flatCount,
@@ -63,8 +63,8 @@ export class MockBackendClient {
     return { property };
   }
 
-  async getLandlordProperties({ landlordPhone }) {
-    const key = normalisePhone(landlordPhone);
+  async getLandlordProperties({ phone }) {
+    const key = normalisePhone(phone);
     return { properties: [...this.properties.values()].filter((property) => property.landlordPhone === key) };
   }
 
@@ -180,13 +180,33 @@ export class MockBackendClient {
     };
   }
 
-  async listTenants({ landlordPhone, propertyCode }) {
+  async listTenants({ phone, propertyCode }) {
     const property = this.properties.get(String(propertyCode).toUpperCase());
-    if (!property || property.landlordPhone !== normalisePhone(landlordPhone)) return { tenants: [] };
+    if (!property || property.landlordPhone !== normalisePhone(phone)) return { tenants: [] };
     return { tenants: property.tenants };
   }
 
   async requestWithdrawal({ phone, channel, amount }) {
     return { withdrawal: { amount, channel, bankName: channel === 'bank' ? 'Saved Bank' : channel, last4: '7891' } };
+  }
+
+  async removeTenant({ phone, tenantPhone }) {
+    return { tenantName: 'Mock Tenant', propertyName: 'Mock Property' };
+  }
+
+  async getPropertyDetails({ phone, code }) {
+    return {
+      code,
+      label: 'Mock Property',
+      address: '123 Mock St',
+      flat_count: 10,
+      activeTenantCount: 2,
+      status: 'Active'
+    };
+  }
+
+  async getHelp({ phone }) {
+    const user = this.users.get(normalisePhone(phone));
+    return { role: user?.role || 'tenant' };
   }
 }

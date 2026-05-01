@@ -9,7 +9,7 @@
   },
   "scripts": {
     "start": "node src/main.js",
-    "dev": "NODE_ENV=development node --watch src/main.js",
+    "dev": "node --watch src/main.js",
     "test": "node --test src/tests/*.test.js",
     "check": "node --check src/main.js && node --test src/tests/*.test.js"
   },

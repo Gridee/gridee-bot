@@ -89,10 +89,25 @@ export class HttpBackendClient {
     return this.request(`/bot/landlords/${encodeURIComponent(normalisePhone(landlordPhone))}/properties/${encodeURIComponent(propertyCode)}/tenants`);
   }
 
-  requestWithdrawal({ phone, channel, amount }) {
+  requestWithdrawal({ phone, amount }) {
     return this.request(`/bot/landlords/${encodeURIComponent(normalisePhone(phone))}/withdrawals`, {
       method: 'POST',
-      body: { channel, amount },
+      body: { amount },
     });
+  }
+
+  removeTenant({ phone, tenantPhone }) {
+    return this.request(`/bot/landlords/${encodeURIComponent(normalisePhone(phone))}/remove-tenant`, {
+      method: 'POST',
+      body: { tenantPhone: normalisePhone(tenantPhone) },
+    });
+  }
+
+  getHelp({ phone }) {
+    return this.request(`/bot/users/${encodeURIComponent(normalisePhone(phone))}/help`);
+  }
+
+  getPropertyDetails({ phone, code }) {
+    return this.request(`/bot/landlords/${encodeURIComponent(normalisePhone(phone))}/properties/${encodeURIComponent(code)}`);
   }
 }

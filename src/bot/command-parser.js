@@ -22,6 +22,7 @@ export function parseCommand(text) {
   if (upper === 'ADD PROPERTY' || upper === 'NEW PROPERTY') return { command: Command.ADD_PROPERTY, raw, args: {} };
   if (upper === 'MY PROPERTIES' || upper === 'PROPERTIES') return { command: Command.MY_PROPERTIES, raw, args: {} };
   if (upper.startsWith('TENANTS')) return { command: Command.TENANTS, raw, args: { propertyCode: raw.split(' ')[1]?.toUpperCase() } };
+  if (upper.startsWith('PROPERTY ')) return { command: Command.PROPERTY, raw, args: { propertyCode: raw.split(' ')[1]?.toUpperCase() } };
   if (upper === 'EARNINGS' || upper === 'BALANCE LANDLORD') return { command: Command.EARNINGS, raw, args: {} };
   if (upper === 'WITHDRAW') return { command: Command.WITHDRAW, raw, args: {} };
   if (upper.startsWith('REMOVE TENANT')) return { command: Command.REMOVE_TENANT, raw, args: { phone: raw.split(' ')[2] } };
