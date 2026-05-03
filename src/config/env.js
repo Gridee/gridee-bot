@@ -42,6 +42,7 @@ export function loadEnv() {
     backendMode: oneOf('BACKEND_MODE', ['mock', 'http']),
     backendBaseUrl: readEnv('GRIDEE_BACKEND_BASE_URL').replace(/\/$/, ''),
     backendApiKey: readEnv('GRIDEE_BACKEND_API_KEY'),
+    backendSharedSecret: readEnv('GRIDEE_BACKEND_SHARED_SECRET'),
     sessionTtlSeconds: toInt('SESSION_TTL_SECONDS'),
     idempotencyTtlSeconds: toInt('IDEMPOTENCY_TTL_SECONDS'),
     twilio: Object.freeze({
