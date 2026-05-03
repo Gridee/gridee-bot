@@ -1,11 +1,11 @@
 import { normalisePhone } from '../services/phone.js';
 
 export class HttpBackendClient {
-  constructor({ baseUrl, apiKey }) {
+  constructor({ baseUrl, apiKey, sharedSecret }) {
     if (!baseUrl) throw new Error('GRIDEE_BACKEND_BASE_URL is required when BACKEND_MODE=http');
-    if (!apiKey) throw new Error('GRIDEE_BACKEND_API_KEY is required when BACKEND_MODE=http');
     this.baseUrl = baseUrl.replace(/\/$/, '');
     this.apiKey = apiKey;
+    this.sharedSecret = sharedSecret;
   }
 
   async request(path, { method = 'GET', body } = {}) {
@@ -13,6 +13,7 @@ export class HttpBackendClient {
       method,
       headers: {
         Authorization: `Bearer ${this.apiKey}`,
+        'x-bot-secret': this.sharedSecret,
         'Content-Type': 'application/json',
       },
       body: body === undefined ? undefined : JSON.stringify(body),
