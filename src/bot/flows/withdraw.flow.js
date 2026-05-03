@@ -18,6 +18,9 @@ export class WithdrawFlow {
   async begin(phone) {
     const bankDetails = await this.backend.getBankDetails({ phone });
     const earnings = await this.backend.getLandlordEarnings({ phone });
+    if (earnings.total <= 0) {
+      return reply("You don't have any earnings to withdraw yet. Type EARNINGS to check your balance.");
+    }
 
     if (!bankDetails.accountNumber) {
       await this.sessionStore.set(phone, {
@@ -51,32 +54,34 @@ export class WithdrawFlow {
     const data = { ...(session.data ?? {}) };
 
     if (session.step === ScreenId.WITHDRAW_BANK_INPUT) {
-      const channel = CHANNELS[String(text).trim()];
-      if (!channel) return reply(renderScreen(ScreenId.WITHDRAW_BANK_INPUT));
-      data.bankName = channel;
-      await this.sessionStore.set(phone, { ...session, step: ScreenId.WITHDRAW_ACCOUNT_INPUT, data });
-      return reply(renderScreen(ScreenId.WITHDRAW_ACCOUNT_INPUT));
+      const accountNumber = String(text).trim();
+      if (!/^\d{10}$/.test(accountNumber)) {
+        return reply('Please enter a valid 10-digit account number.');
+      }
+      data.accountNumber = accountNumber;
+      await this.sessionStore.set(phone, { ...session, step: ScreenId.WITHDRAW_BANK_NAME, data });
+      return reply(renderScreen(ScreenId.WITHDRAW_BANK_NAME));
     }
 
-    if (session.step === ScreenId.WITHDRAW_ACCOUNT_INPUT) {
-      const accountNumber = String(text).trim();
-      if (!/^\d{10}$/.test(accountNumber)) return reply('Please enter a valid 10-digit account number.');
-      data.accountNumber = accountNumber;
+    if (session.step === ScreenId.WITHDRAW_BANK_NAME) {
+      const bankName = String(text).trim();
+      if (bankName.length < 2) return reply('Please enter a valid bank name.');
+      data.bankName = bankName;
 
       // Save details for next time
-      await this.backend.saveBankDetails({ phone, bankName: data.bankName, accountNumber });
+      await this.backend.saveBankDetails({ phone, bankName, accountNumber: data.accountNumber });
 
       await this.sessionStore.set(phone, { ...session, step: ScreenId.WITHDRAW_CONFIRM, data });
       return reply(renderScreen(ScreenId.WITHDRAW_CONFIRM, {
         amount: data.totalEarnings,
         bankName: data.bankName,
-        last4: accountNumber.slice(-4),
+        last4: data.accountNumber.slice(-4),
       }));
     }
 
     if (session.step === ScreenId.WITHDRAW_CONFIRM) {
       if (String(text).trim().toUpperCase() !== 'CONFIRM') {
-        return reply('Type *CONFIRM* to proceed with your withdrawal, or *CANCEL* to stop.');
+        return reply('Please type CONFIRM to proceed or CANCEL to stop.');
       }
 
       const result = await this.backend.requestWithdrawal({ phone, amount: data.totalEarnings });

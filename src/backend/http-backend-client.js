@@ -50,7 +50,10 @@ export class HttpBackendClient {
   }
 
   createProperty(input) {
-    return this.request('/bot/properties', { method: 'POST', body: input });
+    return this.request('/bot/properties', {
+      method: 'POST',
+      body: { ...input, phone: normalisePhone(input.phone) }
+    });
   }
 
   getLandlordProperties({ landlordPhone }) {
@@ -66,7 +69,10 @@ export class HttpBackendClient {
   }
 
   createPaymentIntent(input) {
-    return this.request('/bot/payments/intents', { method: 'POST', body: input });
+    return this.request('/bot/payments/intents', {
+      method: 'POST',
+      body: { ...input, phone: normalisePhone(input.phone) }
+    });
   }
 
   getTenantBalance({ phone }) {

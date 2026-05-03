@@ -8,7 +8,7 @@ const rl = readline.createInterface({
   prompt: 'You> '
 });
 
-const phone = 'whatsapp:+2348000000000'; // Default test number
+const phone = process.argv[2] || 'whatsapp:+2348000000000'; // Default test number
 
 console.log('--- Gridee WhatsApp Bot CLI Test ---');
 console.log(`Sending messages as ${phone}`);
@@ -38,14 +38,20 @@ rl.on('line', async (line) => {
     const result = await response.text();
     
     // Extract the message from TwiML XML
+    let messageText = '';
     const match = result.match(/<Message>(.*?)<\/Message>/s);
     if (match) {
+      messageText = match[1];
+      // Strip CDATA tags if present
+      messageText = messageText.replace(/<!\[CDATA\[(.*?)\]\]>/s, '$1');
+      
       // Decode basic HTML entities for readability in terminal
-      const decoded = match[1]
+      const decoded = messageText
         .replace(/&amp;/g, '&')
         .replace(/&lt;/g, '<')
         .replace(/&gt;/g, '>')
         .replace(/&quot;/g, '"')
+        .replace(/&apos;/g, "'")
         .replace(/&#39;/g, "'");
       
       console.log('\nBot>\n\x1b[36m%s\x1b[0m\n', decoded.trim());

@@ -8,6 +8,12 @@ const PAYMENT_METHODS = Object.freeze({
   '1': 'bank_transfer',
   '2': 'mobile_money',
   '3': 'crypto',
+  'bank transfer': 'bank_transfer',
+  'bank': 'bank_transfer',
+  'mobile money': 'mobile_money',
+  'mobile': 'mobile_money',
+  'crypto': 'crypto',
+  'cryptocurrency': 'crypto',
 });
 
 export class BuyEnergyFlow {
@@ -60,9 +66,9 @@ export class BuyEnergyFlow {
     }
 
     if (session.step === ScreenId.BUY_CONFIRM) {
-      const selected = String(text).trim();
+      const selected = String(text).trim().toLowerCase();
       const paymentMethod = PAYMENT_METHODS[selected];
-      if (!paymentMethod) return reply(renderScreen(ScreenId.BUY_CONFIRM, data));
+      if (!paymentMethod) return reply('Please choose a payment method:\n1. Bank Transfer\n2. Mobile Money\n3. Crypto');
 
       const result = await this.backend.createPaymentIntent({
         tenantPhone: phone,

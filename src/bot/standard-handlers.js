@@ -45,7 +45,7 @@ export class StandardHandlers {
 
     if (parsed.command === Command.BALANCE) {
       const result = await this.backend.getTenantBalance({ phone });
-      return reply(renderScreen(ScreenId.BALANCE_VIEW, result.balance));
+      return reply(renderScreen(ScreenId.BALANCE_VIEW, result));
     }
 
     if (parsed.command === Command.HISTORY) {
@@ -56,12 +56,6 @@ export class StandardHandlers {
     if (parsed.command === Command.MY_PROPERTY) {
       const result = await this.backend.getTenantProperty({ phone });
       return reply(renderScreen(ScreenId.MY_PROPERTY_VIEW, result));
-    }
-
-    if (parsed.command === Command.REMOVE_TENANT) {
-      if (!parsed.args.phone) return reply('Please include the tenant phone number. Example: REMOVE TENANT 2348000000000');
-      const result = await this.backend.removeTenant({ phone, tenantPhone: parsed.args.phone });
-      return reply(renderScreen(ScreenId.TENANT_REMOVED_LANDLORD, { name: result.tenantName, property: result.propertyName }));
     }
 
     if (parsed.command === Command.PROPERTY) {

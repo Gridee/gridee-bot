@@ -140,9 +140,7 @@ export class TwilioProvider extends WhatsAppProvider {
   }
 
   twiml(text) {
-    return `<?xml version="1.0" encoding="UTF-8"?><Response><Message>${escapeXml(
-      text,
-    )}</Message></Response>`;
+    return `<?xml version="1.0" encoding="UTF-8"?><Response><Message><![CDATA[${text}]]></Message></Response>`;
   }
 
   async sendText({ to, text }) {

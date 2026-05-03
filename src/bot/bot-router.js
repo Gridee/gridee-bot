@@ -9,6 +9,7 @@ import { TenantRegisterFlow } from './flows/tenant-register.flow.js';
 import { AddPropertyFlow } from './flows/add-property.flow.js';
 import { BuyEnergyFlow } from './flows/buy-energy.flow.js';
 import { WithdrawFlow } from './flows/withdraw.flow.js';
+import { RemoveTenantFlow } from './flows/remove-tenant.flow.js';
 import { StandardHandlers } from './standard-handlers.js';
 
 export class BotRouter {
@@ -23,6 +24,7 @@ export class BotRouter {
     this.addPropertyFlow = new AddPropertyFlow({ sessionStore, backend });
     this.buyEnergyFlow = new BuyEnergyFlow({ sessionStore, backend, business });
     this.withdrawFlow = new WithdrawFlow({ sessionStore, backend });
+    this.removeTenantFlow = new RemoveTenantFlow({ sessionStore, backend });
     this.standardHandlers = new StandardHandlers({ backend });
   }
 
@@ -93,6 +95,11 @@ export class BotRouter {
         return this.withdrawFlow.begin(phone);
       }
 
+      if (parsed.command === Command.REMOVE_TENANT) {
+        if (user.role !== 'landlord') return reply('Only landlords can remove tenants. Type HELP to see your options.');
+        return this.removeTenantFlow.begin(phone, parsed.args.phone);
+      }
+
       const standard = await this.standardHandlers.handle({ phone, parsed, user });
       if (standard) return standard;
 
@@ -125,6 +132,8 @@ export class BotRouter {
         return this.buyEnergyFlow.continue({ phone, text, session });
       case ActiveCommand.WITHDRAW:
         return this.withdrawFlow.continue({ phone, text, session });
+      case ActiveCommand.REMOVE_TENANT:
+        return this.removeTenantFlow.continue({ phone, text, session });
       default:
         await this.sessionStore.clear(phone);
         return reply(renderScreen(ScreenId.SESSION_EXPIRED));

@@ -20,5 +20,8 @@
     "meta",
     "bot"
   ],
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "dependencies": {
+    "ioredis": "^5.10.1"
+  }
 }
