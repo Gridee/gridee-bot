@@ -29,7 +29,7 @@ export const templates = Object.freeze({
   [ScreenId.TENANT_REG_OTP]: () => 'Enter the OTP sent to your number.',
   [ScreenId.TENANT_REG_PROP_CODE]: () => 'Enter the Property Code your landlord gave you.\n\nExample: GRD-LAG-0042',
 
-  [ScreenId.HELP_LANDLORD]: () => `Gridee Landlord Menu ⚡\n\nADD PROPERTY - Register a property\nMY PROPERTIES - View your properties\nTENANTS [code] - View tenants\nEARNINGS - View earnings\nWITHDRAW - Request payout\nHELP - Show this menu`,
+  [ScreenId.HELP_LANDLORD]: () => `Gridee Landlord Menu ⚡\n\nADD PROPERTY - Register a property\nMY PROPERTIES - View your properties\nTENANTS [code] - View tenants\nREMOVE TENANT - Remove a tenant\nEARNINGS - View earnings\nWITHDRAW - Request payout\nHELP - Show this menu`,
   [ScreenId.HELP_TENANT]: () => `Gridee Tenant Menu ⚡\n\nBUY [amount] - Buy electricity\nBALANCE - Check your balance\nHISTORY - View transactions\nMY PROPERTY - View your property\nHELP - Show this menu`,
 
   [ScreenId.ERROR_GENERIC]: () => 'Something went wrong. Please try again or type HELP.',
@@ -64,10 +64,13 @@ export const templates = Object.freeze({
   [ScreenId.ADD_PROPERTY_ADDRESS]: () => 'Enter the property address (street, area, state):',
   [ScreenId.ADD_PROPERTY_FLAT_COUNT]: () => 'How many rentable flats/units are in this compound?',
   [ScreenId.ADD_PROPERTY_LABEL]: () => 'Give this property a short name.\n\nExample: Surulere Block A',
-  [ScreenId.PROPERTY_REGISTERED]: ({ code, label }) => `Property registered!\n\n${label}\nCode: ${code}\n\nShare this code with your tenants.`,
-  [ScreenId.PROPERTY_DETAIL]: ({ code, label, address, flatCount, activeTenantCount, solarStatus }) => `${label}\nCode: ${code}\nAddress: ${address}\nFlats: ${flatCount}\nActive tenants: ${activeTenantCount}\nSolar status: ${solarStatus}`,
+  [ScreenId.PROPERTY_REGISTERED]: ({ code, label }) => `Property registered! Your code is ${code}. Share it with your tenants.`,
+  [ScreenId.PROPERTY_DETAIL]: ({ code, label, address, flatCount, activeTenantCount, solarStatus }) => `Code: ${code}\nLabel: ${label}\nAddress: ${address}\nFlat count: ${flatCount}\nActive tenant count: ${activeTenantCount}\nSolar status: ${solarStatus}`,
   [ScreenId.TENANTS_LIST]: ({ tenants = [] }) => {
-    const lines = tenants.map((tenant, index) => `${index + 1}. ${tenant.name} — ${tenant.flatNumber} — ${tenant.status}`);
+    const lines = tenants.map((tenant, index) => {
+      const flat = tenant.flatNumber ? ` — ${tenant.flatNumber}` : '';
+      return `${index + 1}. ${tenant.name}${flat} — ${tenant.status}`;
+    });
     return `Tenants:\n\n${listLines(lines, 'No tenants registered under this property yet.')}`;
   },
 
@@ -76,12 +79,14 @@ export const templates = Object.freeze({
     return `Total earnings: ${money(totalEarnings)} across ${propertyCount} properties.\n\n${listLines(lines, 'No property earnings yet.')}`;
   },
   [ScreenId.EARNINGS_PROPERTY]: ({ code, amount, purchases }) => `Earnings for ${code}:\n\nTotal: ${money(amount)}\nPurchases: ${purchases}`,
-  [ScreenId.WITHDRAW_BANK_INPUT]: () => 'Where should we send your funds?\n\n1. Bank Account\n2. OPay\n3. PalmPay',
-  [ScreenId.WITHDRAW_CONFIRM]: ({ amount, bankName, last4 }) => `Withdraw ${money(amount)} to ${bankName} ****${last4}?\n\nReply CONFIRM to proceed.`,
-  [ScreenId.WITHDRAWAL_INITIATED]: ({ amount, bankName, last4 }) => `${money(amount)} is being transferred to ${bankName} ****${last4}. Should arrive within 2 hours.`,
+  [ScreenId.WITHDRAW_BANK_INPUT]: () => 'Enter bank account number:',
+  [ScreenId.WITHDRAW_BANK_NAME]: () => 'Enter bank name:',
+  [ScreenId.WITHDRAW_CONFIRM]: ({ amount, bankName, last4 }) => `Withdraw ${money(amount)} to ${bankName} ****${last4}?`,
+  [ScreenId.WITHDRAWAL_INITIATED]: () => `Withdrawal initiated. Funds arrive within 2 hours.`,
 
+  [ScreenId.REMOVE_TENANT_PROPERTY]: () => 'Enter Property Code:',
   [ScreenId.REMOVE_TENANT_PHONE]: () => 'Enter the phone number of the tenant you want to remove:',
-  [ScreenId.REMOVE_TENANT_CONFIRM]: ({ name, property }) => `Remove ${name} from ${property}?\n\nThis stops their solar access. Reply CONFIRM to proceed.`,
+  [ScreenId.REMOVE_TENANT_CONFIRM]: ({ name, property }) => `Remove ${name} from ${property}? This stops their solar access.`,
   [ScreenId.TENANT_REMOVED_LANDLORD]: ({ name, property }) => `Done. ${name} has been removed from ${property} and their solar access has stopped.`,
 
   [ScreenId.ALERT_LOW_BALANCE]: ({ balance }) => `⚠️ Low Energy Alert! Your balance is below 1 kWh (${balance} GRD left). Type BUY [amount] to top up now.`,

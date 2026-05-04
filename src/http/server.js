@@ -47,7 +47,14 @@ export function createServer({ env, provider, botRouter, logger }) {
       return sendJson(response, 404, { error: 'Not found' });
     } catch (error) {
       logger.error('Request failed', { error: error.message, stack: error.stack });
-      return sendJson(response, 500, { error: 'Internal server error' });
+      const userMessage = error.message.includes('Unexpected token') 
+        ? '⚠️ The payment service is currently busy. Please try again in a moment.' 
+        : '⚠️ Sorry, something went wrong on our end. Please type HELP to restart.';
+
+      if (provider.name === 'twilio' && provider.shouldReplyWithTwiml()) {
+        return sendText(response, 200, provider.twiml(userMessage), 'application/xml');
+      }
+      return sendJson(response, 500, { error: 'Internal server error', message: userMessage });
     }
   });
 }

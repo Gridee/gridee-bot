@@ -52,13 +52,21 @@ export class LandlordRegisterFlow {
       const verification = await this.backend.verifyOtp({ phone: data.verificationPhone, code, purpose: 'registration' });
       if (!verification.valid) return reply(renderScreen(ScreenId.ERROR_INVALID_OTP));
 
-      const result = await this.backend.registerLandlord({
-        phone,
-        name: data.name,
-        verificationPhone: data.verificationPhone,
-      });
-      await this.sessionStore.clear(phone);
-      return reply(renderScreen(ScreenId.REGISTRATION_SUCCESS, { name: result.user.name, role: 'landlord' }));
+      try {
+        const result = await this.backend.registerLandlord({
+          phone,
+          name: data.name,
+          verificationPhone: data.verificationPhone,
+        });
+        await this.sessionStore.clear(phone);
+        return reply(renderScreen(ScreenId.REGISTRATION_SUCCESS, { name: result.user.name, role: 'landlord' }));
+      } catch (error) {
+        if (error.status === 409) {
+          await this.sessionStore.clear(phone);
+          return reply(renderScreen(ScreenId.ERROR_ALREADY_REGISTERED));
+        }
+        throw error;
+      }
     }
 
     await this.sessionStore.clear(phone);

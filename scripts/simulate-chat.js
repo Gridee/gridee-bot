@@ -2,8 +2,10 @@ import fs from 'fs';
 
 const BOT_URL = 'http://localhost:4100/webhooks/whatsapp';
 const phone = 'whatsapp:+2348000000000';
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 async function sendMessage(text, fromPhone = phone) {
+  await sleep(1000); // 1s delay
   console.log(`\nYou (${fromPhone.replace('whatsapp:', '')})> ${text}`);
   const params = new URLSearchParams();
   params.append('From', fromPhone);
@@ -37,13 +39,13 @@ async function sendMessage(text, fromPhone = phone) {
 
 async function runTest() {
   console.log('--- Gridee Bot Automated Regression ---');
-  
+
   // 1. Onboarding & Registration
   await sendMessage('CANCEL');
   await sendMessage('START');
   await sendMessage('1'); // Landlord
   await sendMessage('John Doe'); // Name
-  await sendMessage('08012345678'); // Verification Phone
+  await sendMessage('08000000000'); // Verification Phone (MATCHES SENDER)
   await sendMessage('123456'); // OTP (Mock)
 
   // 2. Add Property Flow
@@ -66,14 +68,14 @@ async function runTest() {
   await sendMessage('START', tenantPhone);
   await sendMessage('2', tenantPhone); // Tenant
   await sendMessage('Jane Doe', tenantPhone); // Name
-  await sendMessage('08099999999', tenantPhone); // Verification Phone
+  await sendMessage('08000000001', tenantPhone); // Verification Phone (MATCHES SENDER)
+  await sendMessage('GRD-LAG-0001', tenantPhone); // Property Code (NEW ORDER)
   await sendMessage('123456', tenantPhone); // OTP (Mock)
-  await sendMessage('GRD-LAG-0001', tenantPhone); // Property Code
 
   // Tenant Commands
   await sendMessage('MY PROPERTY', tenantPhone);
   await sendMessage('HELP', tenantPhone);
-  
+
   console.log('\n--- Regression Complete ---');
 }
 

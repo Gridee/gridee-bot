@@ -1,11 +1,11 @@
 import { normalisePhone } from '../services/phone.js';
 
 export class HttpBackendClient {
-  constructor({ baseUrl, apiKey }) {
+  constructor({ baseUrl, apiKey, sharedSecret }) {
     if (!baseUrl) throw new Error('GRIDEE_BACKEND_BASE_URL is required when BACKEND_MODE=http');
-    if (!apiKey) throw new Error('GRIDEE_BACKEND_API_KEY is required when BACKEND_MODE=http');
     this.baseUrl = baseUrl.replace(/\/$/, '');
     this.apiKey = apiKey;
+    this.sharedSecret = sharedSecret;
   }
 
   async request(path, { method = 'GET', body } = {}) {
@@ -13,6 +13,7 @@ export class HttpBackendClient {
       method,
       headers: {
         Authorization: `Bearer ${this.apiKey}`,
+        'x-bot-secret': this.sharedSecret,
         'Content-Type': 'application/json',
       },
       body: body === undefined ? undefined : JSON.stringify(body),
@@ -50,7 +51,10 @@ export class HttpBackendClient {
   }
 
   createProperty(input) {
-    return this.request('/bot/properties', { method: 'POST', body: input });
+    return this.request('/bot/properties', {
+      method: 'POST',
+      body: { ...input, phone: normalisePhone(input.phone) }
+    });
   }
 
   getLandlordProperties({ landlordPhone }) {
@@ -66,7 +70,10 @@ export class HttpBackendClient {
   }
 
   createPaymentIntent(input) {
-    return this.request('/bot/payments/intents', { method: 'POST', body: input });
+    return this.request('/bot/payments/intents', {
+      method: 'POST',
+      body: { ...input, phone: normalisePhone(input.phone) }
+    });
   }
 
   getTenantBalance({ phone }) {
@@ -85,6 +92,10 @@ export class HttpBackendClient {
     return this.request(`/bot/landlords/${encodeURIComponent(normalisePhone(phone))}/earnings`);
   }
 
+  getLandlordPropertyEarnings({ phone, code }) {
+    return this.request(`/bot/landlords/${encodeURIComponent(normalisePhone(phone))}/properties/${encodeURIComponent(code)}/earnings`);
+  }
+
   listTenants({ landlordPhone, propertyCode }) {
     return this.request(`/bot/landlords/${encodeURIComponent(normalisePhone(landlordPhone))}/properties/${encodeURIComponent(propertyCode)}/tenants`);
   }
@@ -93,6 +104,17 @@ export class HttpBackendClient {
     return this.request(`/bot/landlords/${encodeURIComponent(normalisePhone(phone))}/withdrawals`, {
       method: 'POST',
       body: { amount },
+    });
+  }
+
+  getBankDetails({ phone }) {
+    return this.request(`/bot/landlords/${encodeURIComponent(normalisePhone(phone))}/bank-details`);
+  }
+
+  saveBankDetails({ phone, bankName, accountNumber }) {
+    return this.request(`/bot/landlords/${encodeURIComponent(normalisePhone(phone))}/bank-details`, {
+      method: 'POST',
+      body: { bankName, accountNumber },
     });
   }
 

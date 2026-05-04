@@ -27,7 +27,7 @@ export function isOtp(value) {
 }
 
 export function isLikelyPropertyCode(value) {
-  return /^GRD-[A-Z]{2,4}-\d{4}$/i.test(String(value ?? '').trim());
+  return /^GRD-[A-Z0-9\-]+$/i.test(String(value ?? '').trim());
 }
 
 export class ValidationError extends Error {

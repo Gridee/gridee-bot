@@ -27,13 +27,25 @@ export class StandardHandlers {
     }
 
     if (parsed.command === Command.EARNINGS) {
+      if (parsed.args.propertyCode) {
+        const result = await this.backend.getLandlordPropertyEarnings({ phone, code: parsed.args.propertyCode });
+        return reply(renderScreen(ScreenId.EARNINGS_PROPERTY, {
+          code: result.code,
+          amount: result.amount,
+          purchases: result.purchaseCount,
+        }));
+      }
       const result = await this.backend.getLandlordEarnings({ phone });
-      return reply(renderScreen(ScreenId.EARNINGS_OVERVIEW, result.earnings));
+      return reply(renderScreen(ScreenId.EARNINGS_OVERVIEW, {
+        totalEarnings: result.total,
+        propertyCount: result.breakdown.length,
+        breakdown: result.breakdown,
+      }));
     }
 
     if (parsed.command === Command.BALANCE) {
       const result = await this.backend.getTenantBalance({ phone });
-      return reply(renderScreen(ScreenId.BALANCE_VIEW, result.balance));
+      return reply(renderScreen(ScreenId.BALANCE_VIEW, result));
     }
 
     if (parsed.command === Command.HISTORY) {
@@ -43,13 +55,7 @@ export class StandardHandlers {
 
     if (parsed.command === Command.MY_PROPERTY) {
       const result = await this.backend.getTenantProperty({ phone });
-      return reply(renderScreen(ScreenId.MY_PROPERTY_VIEW, result.property));
-    }
-
-    if (parsed.command === Command.REMOVE_TENANT) {
-      if (!parsed.args.phone) return reply('Please include the tenant phone number. Example: REMOVE TENANT 2348000000000');
-      const result = await this.backend.removeTenant({ phone, tenantPhone: parsed.args.phone });
-      return reply(renderScreen(ScreenId.TENANT_REMOVED_LANDLORD, { name: result.tenantName, property: result.propertyName }));
+      return reply(renderScreen(ScreenId.MY_PROPERTY_VIEW, result));
     }
 
     if (parsed.command === Command.PROPERTY) {

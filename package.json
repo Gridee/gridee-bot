@@ -9,7 +9,7 @@
   },
   "scripts": {
     "start": "node src/main.js",
-    "dev": "node --watch src/main.js",
+    "dev": "node --env-file=.env --watch src/main.js",
     "test": "node --test src/tests/*.test.js",
     "check": "node --check src/main.js && node --test src/tests/*.test.js"
   },
@@ -20,5 +20,8 @@
     "meta",
     "bot"
   ],
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "dependencies": {
+    "ioredis": "^5.10.1"
+  }
 }

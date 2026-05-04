@@ -49,8 +49,8 @@ export class AddPropertyFlow {
       });
       await this.sessionStore.clear(phone);
       return reply(renderScreen(ScreenId.PROPERTY_REGISTERED, {
-        code: result.property.code,
-        label: result.property.label,
+        code: result.code,
+        label: result.label,
       }));
     }
 
