@@ -72,7 +72,11 @@ export class HttpBackendClient {
   createPaymentIntent(input) {
     return this.request('/bot/payments/intents', {
       method: 'POST',
-      body: { ...input, phone: normalisePhone(input.phone) }
+      body: { 
+        ...input, 
+        tenantPhone: normalisePhone(input.tenantPhone),
+        propertyCode: input.propertyCode 
+      }
     });
   }
 

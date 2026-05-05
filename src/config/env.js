@@ -11,6 +11,7 @@ const DEFAULTS = {
   GRIDEE_KWH_RATE_NAIRA: '48',
   GRIDEE_MIN_TOPUP_NAIRA: '2000',
   MOCK_OTP_CODE: '123456',
+  REDIS_URL: 'redis://127.0.0.1:6379',
 };
 
 function readEnv(name) {
@@ -43,6 +44,7 @@ export function loadEnv() {
     backendBaseUrl: readEnv('GRIDEE_BACKEND_BASE_URL').replace(/\/$/, ''),
     backendApiKey: readEnv('GRIDEE_BACKEND_API_KEY'),
     backendSharedSecret: readEnv('GRIDEE_BACKEND_SHARED_SECRET'),
+    redisUrl: readEnv('REDIS_URL'),
     sessionTtlSeconds: toInt('SESSION_TTL_SECONDS'),
     idempotencyTtlSeconds: toInt('IDEMPOTENCY_TTL_SECONDS'),
     twilio: Object.freeze({

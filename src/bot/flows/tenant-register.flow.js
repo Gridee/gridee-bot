@@ -37,6 +37,21 @@ export class TenantRegisterFlow {
     if (session.step === ScreenId.TENANT_REG_PHONE) {
       if (!isValidPhone(text)) return reply('Please enter a valid phone number. Example: 08031234567');
       data.verificationPhone = normalisePhone(text);
+      
+      if (data.propertyCode) {
+        // If we already have the code from the REGISTER command, validate it now
+        const validation = await this.backend.validatePropertyCode({ code: data.propertyCode });
+        if (validation.valid) {
+          await this.backend.sendOtp({ phone: data.verificationPhone, purpose: 'registration' });
+          await this.sessionStore.set(phone, {
+            ...session,
+            step: ScreenId.TENANT_REG_OTP,
+            data,
+          });
+          return reply(renderScreen(ScreenId.TENANT_REG_OTP));
+        }
+      }
+
       await this.sessionStore.set(phone, {
         ...session,
         step: ScreenId.TENANT_REG_PROP_CODE,

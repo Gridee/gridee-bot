@@ -33,10 +33,10 @@ export class BuyEnergyFlow {
       });
       return reply(renderScreen(ScreenId.BUY_AMOUNT));
     }
-    return this.setAmountAndAskPaymentMethod(phone, amountNaira, {});
+    return this.setAmountAndAskPropertyCode(phone, amountNaira, {});
   }
 
-  async setAmountAndAskPaymentMethod(phone, amountNaira, currentData) {
+  async setAmountAndAskPropertyCode(phone, amountNaira, currentData) {
     if (amountNaira < this.business.minTopupNaira) {
       return reply(`Minimum top-up is ₦${this.business.minTopupNaira}. Please type BUY ${this.business.minTopupNaira} or higher.`);
     }
@@ -46,10 +46,10 @@ export class BuyEnergyFlow {
     await this.sessionStore.set(phone, {
       role: 'tenant',
       activeCommand: ActiveCommand.BUY,
-      step: ScreenId.BUY_CONFIRM,
+      step: ScreenId.BUY_PROP_CODE,
       data,
     });
-    return reply(renderScreen(ScreenId.BUY_CONFIRM, data));
+    return reply(renderScreen(ScreenId.BUY_PROP_CODE, data));
   }
 
   async continue({ phone, text, session }) {
@@ -62,7 +62,26 @@ export class BuyEnergyFlow {
       } catch {
         return reply('Please enter a valid amount. Example: 2000');
       }
-      return this.setAmountAndAskPaymentMethod(phone, amountNaira, data);
+      return this.setAmountAndAskPropertyCode(phone, amountNaira, data);
+    }
+
+    if (session.step === ScreenId.BUY_PROP_CODE) {
+      const code = String(text).trim().toUpperCase();
+      try {
+        const { valid, property } = await this.backend.validatePropertyCode({ code });
+        if (!valid || !property) {
+          return reply(renderScreen(ScreenId.ERROR_INVALID_PROP_CODE));
+        }
+        const updatedData = { ...data, propertyCode: code, propertyLabel: property.label };
+        await this.sessionStore.set(phone, {
+          ...session,
+          step: ScreenId.BUY_CONFIRM,
+          data: updatedData,
+        });
+        return reply(renderScreen(ScreenId.BUY_CONFIRM, updatedData));
+      } catch (error) {
+        return reply(renderScreen(ScreenId.ERROR_INVALID_PROP_CODE));
+      }
     }
 
     if (session.step === ScreenId.BUY_CONFIRM) {
@@ -74,6 +93,7 @@ export class BuyEnergyFlow {
         tenantPhone: phone,
         amountNaira: data.amountNaira,
         paymentMethod,
+        propertyCode: data.propertyCode,
       });
       await this.sessionStore.set(phone, {
         ...session,
