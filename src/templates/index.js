@@ -41,7 +41,8 @@ export const templates = Object.freeze({
   [ScreenId.SESSION_EXPIRED]: () => 'Your session has expired. Type START to begin again.',
   [ScreenId.ALREADY_REGISTERED]: () => templates[ScreenId.ERROR_ALREADY_REGISTERED](),
 
-  [ScreenId.BUY_AMOUNT]: () => 'How much would you like to spend?\n\nEnter amount in NGN. Example: BUY 2000',
+  BUY_AMOUNT: () => 'How much would you like to spend?\n\nEnter amount in NGN. Example: BUY 2000',
+  [ScreenId.BUY_PROP_CODE]: () => 'Which property are you buying for? Enter the Property Code (e.g. GRD-LAG-0042):',
   [ScreenId.BUY_CONFIRM]: ({ amountNaira, grdAmount, kwhAmount }) => `You're buying ${Number(grdAmount).toFixed(2)} GRD for ${money(amountNaira)} — roughly ${Number(kwhAmount).toFixed(2)} kWh.\n\nChoose a payment method:\n1. Bank Transfer\n2. Mobile Money\n3. Crypto`,
   [ScreenId.PAYMENT_INSTRUCTIONS_BANK]: ({ amountNaira, bankName, accountNumber, accountName, reference, expiresInMinutes = 15 }) => `Transfer ${money(amountNaira)} to:\n\nBank: ${bankName}\nAccount: ${accountNumber}\nName: ${accountName}\nReference: ${reference}\n\nThis account expires in ${expiresInMinutes} minutes.`,
   [ScreenId.PAYMENT_INSTRUCTIONS_MOBILE_MONEY]: ({ amountNaira, network, reference }) => `Pay ${money(amountNaira)} using ${network}.\n\nReference: ${reference}\n\nYou will receive confirmation once payment is complete.`,

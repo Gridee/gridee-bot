@@ -8,6 +8,7 @@ function nowMs() {
 export class RedisSessionStore {
   constructor({ url, ttlSeconds = 1800 } = {}) {
     this.redis = new Redis(url);
+    this.redis.on('error', (err) => console.error('Redis SessionStore Error:', err));
     this.ttlSeconds = ttlSeconds;
     this.prefix = 'gridee:session:';
   }
@@ -42,6 +43,7 @@ export class RedisSessionStore {
 export class RedisIdempotencyStore {
   constructor({ url, ttlSeconds = 86400 } = {}) {
     this.redis = new Redis(url);
+    this.redis.on('error', (err) => console.error('Redis IdempotencyStore Error:', err));
     this.ttlSeconds = ttlSeconds;
     this.prefix = 'gridee:idempotency:';
   }
